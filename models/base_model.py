@@ -32,6 +32,7 @@ class BaseModel(ABC):
         self.opt = opt
         self.gpu_ids = opt.gpu_ids
         self.isTrain = opt.isTrain
+        self.isTest = not self.isTrain
         self.device = torch.device('cuda:{}'.format(self.gpu_ids[0])) if self.gpu_ids else torch.device('cpu')  # get device name: CPU or GPU
         self.save_dir = os.path.join(opt.checkpoints_dir, opt.name)  # save all the checkpoints to save_dir
         if opt.preprocess != 'scale_width':  # with [scale_width], input images might have different sizes, which hurts the performance of cudnn.benchmark.
@@ -81,7 +82,7 @@ class BaseModel(ABC):
         Parameters:
             opt (Option class) -- stores all the experiment flags; needs to be a subclass of BaseOptions
         """
-        if self.isTrain:
+        if self.isTrain or self.isTest:
             self.schedulers = [networks.get_scheduler(optimizer, opt) for optimizer in self.optimizers]
         if not self.isTrain or opt.continue_train:
             load_suffix = 'iter_%d' % opt.load_iter if opt.load_iter > 0 else opt.epoch
@@ -97,17 +98,16 @@ class BaseModel(ABC):
 
     def get_lr(self):
       return self.optimizers[0].param_groups[0]['lr']
-      
+    
+    @abstractmethod  
     def test(self):
         """Forward function used in test time.
 
         This function wraps <forward> function in no_grad() so we don't save intermediate steps for backprop
         It also calls <compute_visuals> to produce additional visualization results
         """
-        with torch.no_grad():
-            self.forward()
-            self.compute_visuals()
-
+        pass
+        
     def compute_visuals(self):
         """Calculate additional output images for visdom and HTML visualization"""
         pass

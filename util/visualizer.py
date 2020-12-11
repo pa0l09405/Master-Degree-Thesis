@@ -83,7 +83,7 @@ class Visualizer():
         with open(self.log_name, "a") as log_file:
             now = time.strftime("%c")
             log_file.write('================ Training Loss (%s) ================\n' % now)
-
+            
     def reset(self):
         """Reset the self.saved status"""
         self.saved = False
