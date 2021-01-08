@@ -1,0 +1,27 @@
+- What dose the CycleGAN loss look like if training goes well? (#1096, #1086, #288, #30)
+Typically, the cycle-consistency loss and identity loss decrease during training, while GAN losses oscillate. 
+To evaluate the quality of your results, 
+you need to adopt additional evaluation metrics to your training and test images. See the Q & A above.
+
+
+-Unfortunately, the loss curve does not reveal much information in training GANs, and CycleGAN is no exception. 
+To check whether the training has converged or not, we recommend periodically 
+generating a few samples and looking at them.
+
+-Both pix2pix and CycleGAN can work for rectangular images. To make them work, 
+you need to use different preprocessing flags. Let's say that you are working with 360x256 images. 
+During training, you can specify --preprocess crop and --crop_size 256. 
+This will allow your model to be trained on randomly cropped 256x256 images during training time.
+During test time, you can apply the model on 360x256 images with the flag --preprocess none.
+
+- Since the generator architecture in CycleGAN involves a series of downsampling / upsampling operations, 
+the size of the input and output image may not match if the input image size is not a multiple of 4. 
+As a result, you may get a runtime error because the L1 identity loss cannot be enforced with images of different size. 
+Therefore, we slightly resize the image to become multiples of 4 even with --preprocess none option. 
+For the same reason, --crop_size needs to be a multiple of 4
+
+- The current pix2pix/CycleGAN model does not take z as input. In both pix2pix and CycleGAN, 
+we tried to add z to the generator: e.g., adding z to a latent state, concatenating with a latent state, applying dropout, etc., 
+but often found the output did not vary significantly as a function of z. 
+Conditional GANs do not need noise as long as the input is sufficiently complex so that the input can kind of play the role of noise. 
+Without noise, the mapping is deterministic 
