@@ -69,11 +69,11 @@ if __name__ == '__main__':
     if opt.eval:
         model.eval()
     for i, data in enumerate(dataset):
-        #visualizer.reset()
         if i >= opt.num_test:  # only apply our model to opt.num_test images.
             break
         model.set_input(data)  # unpack data from data loader
-        val_DA_loss, val_DB_loss = model.test()           # run inference
+		
+        val_DA_loss, val_DB_loss = model.test()           # run inference and returns losses of the discriminators
         
         valid_D_A_losses.append(val_DA_loss.item())
         valid_D_B_losses.append(val_DB_loss.item())
@@ -83,14 +83,19 @@ if __name__ == '__main__':
         print('processing (%04d)-th image... %s' % (i, img_path))
         print('Valid losses : D_A = '+str(valid_D_A_losses[i])+'  , D_B = '+str(valid_D_B_losses[i]))
         save_images(webpage, visuals, img_path, aspect_ratio=opt.aspect_ratio, width=opt.display_winsize)
+		
     webpage.save()  # save the HTML
+	
     #print valid_Ds_losses on log file
-    valid_DA_loss=(sum(valid_D_A_losses)*float(opt.batch_size))/float(dataset_size)
+    
+	#compute average losses
+	valid_DA_loss=(sum(valid_D_A_losses)*float(opt.batch_size))/float(dataset_size)
     valid_DB_loss=(sum(valid_D_B_losses)*float(opt.batch_size))/float(dataset_size)
-    message = 'Evaluation losses : '
+    #print output on log
+	message = 'Evaluation losses : '
     message += 'D_A_loss : %.3f ' % (valid_DA_loss)
     message += 'D_B_loss : %.3f ' % (valid_DB_loss)
-    print(message)  # print the message
+	print(message)  # print the message
     with open(log_name, "a") as log_file:
         log_file.write('%s\n' % message)  # save the message
     message=[]
