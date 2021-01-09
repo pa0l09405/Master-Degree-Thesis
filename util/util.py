@@ -18,9 +18,7 @@ def tensor2im(input_image, imtype=np.uint8):
             image_tensor = input_image.data
         else:
             return input_image
-        #image_numpy = image_tensor[0].cpu().float().numpy()  # convert it into a numpy array
         image_numpy = image_tensor[0].cpu().numpy()
-        #print(str(image_numpy.shape))
         if image_numpy.shape[0] == 1:  # grayscale to RGB
             image_numpy = np.tile(image_numpy, (3, 1, 1))
         image_numpy = (np.transpose(image_numpy, (1, 2, 0)) + 1) / 2.0 * 255.0  # post-processing: tranpose and scaling
@@ -56,7 +54,6 @@ def save_image(image_numpy, image_path, aspect_ratio=1.0, size=384):
         image_path (str)          -- the path of the image
     """
 
-    #image_numpy = np.asarray(image_numpy)
     image_pil = Image.fromarray(image_numpy)
     h, w, _ = image_numpy.shape
 

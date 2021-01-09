@@ -157,11 +157,6 @@ class Visualizer():
             self.saved = True
             # save images to the disk
             for label, image in visuals.items():
-                #denormalize from input
-                #print("type of image = "+str(type(image))) 
-                #unNorm=unormalize.UnNormalize(mean=0.5, std=0.5)
-                #image=unNorm(image)
-                #print(str(image.shape))
                 image_numpy = util.tensor2im(image)
                 img_path = os.path.join(self.img_dir, 'epoch%.3d_%s.png' % (epoch, label))
                 util.save_image(image_numpy, img_path)
